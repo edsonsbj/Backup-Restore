@@ -3,7 +3,6 @@
 #
 # Pre defined variables
 #
-uuid='05E1A73C04E337C0'
 BackupDir='/mnt/nextcloud_backup'
 NextcloudConfig='/var/www/nextcloud'
 NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
