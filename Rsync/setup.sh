@@ -5,11 +5,6 @@
 #
 BackupDir='/mnt/nextcloud_backup'
 NextcloudConfig='/var/www/nextcloud'
-NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
-DatabaseSystem=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbtype)
-NextcloudDatabase=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbname)
-DBUser=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbuser)
-DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
 BackupRestoreConf='BackupRestore.conf'
 
 # Function for error messages
@@ -29,14 +24,53 @@ fi
 #
 clear
 
-# echo "Enter the directory to which the backups should be saved."
-echo "Enter the UUID of the drive"
-echo "Default: ${uuid}"
-echo ""
-read -p "Enter the UUID corresponding to the unit that will serve as a backup or press ENTER if the UUID is ${uuid}: " UUID
-
-[ -z "$UUID" ] ||  uuid=$UUID
-clear
+lsblk -o NAME,SIZE,RO,FSTYPE,TYPE,MOUNTPOINT,UUID,PTUUID | grep 'sd'
+ 
+# List of available partitions
+partitions=($(lsblk -o NAME,TYPE | grep 'part' | awk '{print $1}'))
+num_partitions=${#partitions[@]}
+ 
+# Check if there is at least one partition
+if [ "$num_partitions" -eq 0 ]; then
+    echo "No partitions found."
+    exit 1
+fi
+ 
+# List available partitions with enumerated numbers
+echo "Available partitions:"
+for ((i = 0; i < num_partitions; i++)); do
+    echo "$((i + 1)). ${partitions[i]}"
+done
+ 
+# Ask the user to choose a partition by number
+read -p "Enter the desired partition number (1-$num_partitions): " partition_number
+ 
+# Check if the partition number is valid
+if ! [[ "$partition_number" =~ ^[0-9]+$ ]]; then
+    echo "Invalid partition number."
+    exit 1
+fi
+ 
+# Verifique se o número de partição está dentro do intervalo válido
+if [ "$partition_number" -lt 1 ] || [ "$partition_number" -gt "$num_partitions" ]; then
+    echo "Número de partição fora do intervalo válido."
+    exit 1
+fi
+ 
+# Get the name of the selected partition
+selected_partition="${partitions[$((partition_number - 1))]}"
+#echo "$selected_partition"
+selected_partition_cleaned=$(echo "$selected_partition" | sed 's/[└─├]//g')
+#echo "$selected_partition_cleaned"
+# Use the 'blkid' command to get the UUID of the selected partition
+uuid="$(blkid -s UUID -o value /dev/"$selected_partition_cleaned")"
+ 
+# Check if the UUID was found
+if [ -n "$uuid" ]; then
+    echo "$uuid"
+else
+    echo "Partition not found or UUID not available."
+fi
 
 echo "Enter the backup drive mount point here."
 echo "Default: ${BackupDir}"
