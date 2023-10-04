@@ -238,11 +238,17 @@ fi
   echo "# TODO: The password of the Nextcloud database user"
   echo "DBPassword='$DBPassword'"
   echo ""
+  echo "# TODO: The directory where the Emby or Jellyfin settings are stored (this directory is stored within /var/lib)"
+  echo "Emby_Conf='$Emby_Conf'"
+  echo "Jellyfin_Conf='$Jellyfin_Conf'"
+  echo ""
+  echo "# TODO: The directory where the Plex Media Server settings are stored (this directory is stored within /var/lib)"
+  echo "Plex_Conf='$Plex_Conf'"
+  echo ""
   echo "# Backup Destinations"
-
   echo ""
   echo "# Log File"
-  echo "LOG_PATH='/var/log/'"
+  echo "LOGFILE_PATH='/var/log/'"
 
  } > ./"${BackupRestoreConf}"
 
