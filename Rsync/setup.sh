@@ -80,26 +80,133 @@ read -p "Enter a directory or press ENTER if the backup directory is ${BackupDir
 [ -z "$BACKUPDIR" ] ||  BackupDir=$BACKUPDIR
 clear
 
-echo "Enter the path to the Nextcloud file directory."
-echo "Usually: ${NextcloudConfig}"
-echo ""
-read -p "Enter a directory or press ENTER if the file directory is ${NextcloudConfig}: " NEXTCLOUDCONF
+# Nextcloud Backup
+read -p "Do you want to Backup Nextcloud? (Y/n) " nextcloud
 
-[ -z "$NEXTCLOUDCONF" ] ||  NextcloudConfig=$NEXTCLOUDCONF
-clear
+# Check user response
+if [[ $nextcloud == "Y" || $nextcloud == "y" ]]; then
+     echo "Backing up Nextcloud..."
+     echo "Enter the path to the Nextcloud file directory."
+     echo "Usually: ${NextcloudConfig}"
+     echo ""
+     read -p "Enter a directory or press ENTER if the file directory is ${NextcloudConfig}: " NEXTCLOUDCONF
 
-echo "UUID: ${uuid}"
-echo "BackupDir: ${BackupDir}"
-echo "NextcloudConfig: ${NextcloudConfig}"
-echo "NextcloudDataDir: ${NextcloudDataDir}"
+     [ -z "$NEXTCLOUDCONF" ] ||  NextcloudConfig=$NEXTCLOUDCONF
+     clear
 
-read -p "Is the information correct? [y/N] " CORRECTINFO
+     NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
+     DatabaseSystem=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbtype)
+     NextcloudDatabase=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbname)
+     DBUser=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbuser)
+     DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
+
+    echo "UUID: ${uuid}"
+    echo "BackupDir: ${BackupDir}"
+    echo "NextcloudConfig: ${NextcloudConfig}"
+    echo "NextcloudDataDir: ${NextcloudDataDir}"
+
+read -p "Is the information correct? [y/n] " CORRECTINFO
 
 if [ "$CORRECTINFO" != 'y' ] ; then
   echo ""
   echo "ABORTING!"
   echo "No file has been altered."
   exit 1
+fi
+
+else
+     echo "Nextcloud backup will not be done."
+fi
+
+clear
+
+# Perguntar ao usuário se ele deseja fazer o backup das configurações do Emby
+echo "Você deseja fazer o backup das configurações do Emby? (y/n)"
+read backup
+
+if [[ $backup == 'y' ]]; then
+    # Perguntar ao usuário se ele executa o Emby ou Jellyfin
+    echo "Você executa o Emby ou Jellyfin? Digite 1 para Emby, 2 para Jellyfin."
+    read escolha
+
+    while true; do
+        if [[ $escolha == '1' ]]; then
+            # Criar a variável Emby_Conf e armazenar a saída /var/lib/Emby
+            Emby_Conf="/var/lib/emby"
+            echo "O local de configuração do Emby é $Emby_Conf. Está correto? (y/n)"
+            read confirmacao
+
+            if [[ $confirmacao == 'y' ]]; then
+                echo "Configuração do Emby confirmada."
+                break
+            else
+                echo "Escolha novamente. Digite 1 para Emby, 2 para Jellyfin."
+                read escolha
+            fi
+        elif [[ $escolha == '2' ]]; then
+            # Criar a variável Jellyfin_Conf e armazenar o local /var/lib/jellyfin
+            Jellyfin_Conf="/var/lib/jellyfin"
+            echo "O local de configuração do Jellyfin é $Jellyfin_Conf. Está correto? (y/n)"
+            read confirmacao
+
+            if [[ $confirmacao == 'y' ]]; then
+                echo "Configuração do Jellyfin confirmada."
+                break
+            else
+                echo "Escolha novamente. Digite 1 para Emby, 2 para Jellyfin."
+                read escolha
+            fi
+        else
+            echo "Resposta inválida. Por favor, digite 1 para Emby ou 2 para Jellyfin."
+            read escolha
+        fi
+    done
+else
+    echo "Backup das configurações do Emby não solicitado."
+fi
+
+echo "Você deseja fazer o backup das configurações do Plex Media Server? (y/n)"
+read backup
+
+if [[ $backup == 'y' ]]; then
+    # Perguntar ao usuário como ele instalou o Plex Media Server
+    echo "Como você instalou o Plex Media Server? Digite 1 para pacotes .deb ou apt install plexmediaserver, 2 para snap install plexmediaserver."
+    read escolha
+
+    while true; do
+        if [[ $escolha == '1' ]]; then
+            # Armazenar o caminho /var/lib/plexmediaserver na variável Plex_Conf
+            Plex_Conf="/var/lib/plexmediaserver"
+            echo "O local de configuração do Plex Media Server é $Plex_Conf. Está correto? (y/n)"
+            read confirmacao
+
+            if [[ $confirmacao == 'y' ]]; then
+                echo "Configuração do Plex Media Server confirmada."
+                break
+            else
+                echo "Escolha novamente. Digite 1 para pacotes .deb ou apt install plexmediaserver, 2 para snap install plexmediaserver."
+                read escolha
+            fi
+        elif [[ $escolha == '2' ]]; then
+            # Armazenar o caminho /var/snap/plexmediaserver na variável Plex_Conf
+            Plex_Conf="/var/snap/plexmediaserver"
+            echo "O local de configuração do Plex Media Server é $Plex_Conf. Está correto? (y/n)"
+            read confirmacao
+
+            if [[ $confirmacao == 'y' ]]; then
+                echo "Configuração do Plex Media Server confirmada."
+                break
+            else
+                echo "Escolha novamente. Digite 1 para pacotes .deb ou apt install plexmediaserver, 2 para snap install plexmediaserver."
+                read escolha
+            fi
+        else
+            echo "Resposta inválida. Por favor, digite 1 para pacotes .deb ou apt install plexmediaserver ou 2 para snap install plexmediaserver."
+            read escolha
+        fi
+    done
+else
+    echo "Backup das configurações do Plex Media Server não solicitado."
 fi
 
 { echo "# Configuration for Backup-Restore scripts"
