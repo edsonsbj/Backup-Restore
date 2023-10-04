@@ -120,93 +120,93 @@ fi
 
 clear
 
-# Perguntar ao usuário se ele deseja fazer o backup das configurações do Emby
-echo "Você deseja fazer o backup das configurações do Emby? (y/n)"
+# Ask the user if they want to backup Emby configurations
+echo "Do you want to backup Emby configurations? (y/n)"
 read backup
 
 if [[ $backup == 'y' ]]; then
-    # Perguntar ao usuário se ele executa o Emby ou Jellyfin
-    echo "Você executa o Emby ou Jellyfin? Digite 1 para Emby, 2 para Jellyfin."
-    read escolha
+    # Ask the user if they run Emby or Jellyfin
+    echo "Do you run Emby or Jellyfin? Type 1 for Emby, 2 for Jellyfin."
+    read choice
 
     while true; do
-        if [[ $escolha == '1' ]]; then
-            # Criar a variável Emby_Conf e armazenar a saída /var/lib/Emby
+        if [[ $choice == '1' ]]; then
+            # Create the Emby_Conf variable and store the output /var/lib/Emby
             Emby_Conf="/var/lib/emby"
-            echo "O local de configuração do Emby é $Emby_Conf. Está correto? (y/n)"
-            read confirmacao
+            echo "The Emby configuration location is $Emby_Conf. Is this correct? (y/n)"
+            read confirmation
 
-            if [[ $confirmacao == 'y' ]]; then
-                echo "Configuração do Emby confirmada."
+            if [[ $confirmation == 'y' ]]; then
+                echo "Emby configuration confirmed."
                 break
             else
-                echo "Escolha novamente. Digite 1 para Emby, 2 para Jellyfin."
-                read escolha
+                echo "Choose again. Type 1 for Emby, 2 for Jellyfin."
+                read choice
             fi
-        elif [[ $escolha == '2' ]]; then
-            # Criar a variável Jellyfin_Conf e armazenar o local /var/lib/jellyfin
+        elif [[ $choice == '2' ]]; then
+            # Create the Jellyfin_Conf variable and store the location /var/lib/jellyfin
             Jellyfin_Conf="/var/lib/jellyfin"
-            echo "O local de configuração do Jellyfin é $Jellyfin_Conf. Está correto? (y/n)"
-            read confirmacao
+            echo "The Jellyfin configuration location is $Jellyfin_Conf. Is this correct? (y/n)"
+            read confirmation
 
-            if [[ $confirmacao == 'y' ]]; then
-                echo "Configuração do Jellyfin confirmada."
+            if [[ $confirmation == 'y' ]]; then
+                echo "Jellyfin configuration confirmed."
                 break
             else
-                echo "Escolha novamente. Digite 1 para Emby, 2 para Jellyfin."
-                read escolha
+                echo "Choose again. Type 1 for Emby, 2 for Jellyfin."
+                read choice
             fi
         else
-            echo "Resposta inválida. Por favor, digite 1 para Emby ou 2 para Jellyfin."
-            read escolha
+            echo "Invalid response. Please type 1 for Emby or 2 for Jellyfin."
+            read choice
         fi
     done
 else
-    echo "Backup das configurações do Emby não solicitado."
+    echo "Backup of Emby configurations not requested."
 fi
 
-echo "Você deseja fazer o backup das configurações do Plex Media Server? (y/n)"
+echo "Do you want to backup Plex Media Server configurations? (y/n)"
 read backup
 
 if [[ $backup == 'y' ]]; then
-    # Perguntar ao usuário como ele instalou o Plex Media Server
-    echo "Como você instalou o Plex Media Server? Digite 1 para pacotes .deb ou apt install plexmediaserver, 2 para snap install plexmediaserver."
-    read escolha
+    # Ask the user how they installed Plex Media Server
+    echo "How did you install Plex Media Server? Type 1 for .deb packages or apt install plexmediaserver, 2 for snap install plexmediaserver."
+    read choice
 
     while true; do
-        if [[ $escolha == '1' ]]; then
-            # Armazenar o caminho /var/lib/plexmediaserver na variável Plex_Conf
+        if [[ $choice == '1' ]]; then
+            # Store the path /var/lib/plexmediaserver in the Plex_Conf variable
             Plex_Conf="/var/lib/plexmediaserver"
-            echo "O local de configuração do Plex Media Server é $Plex_Conf. Está correto? (y/n)"
-            read confirmacao
+            echo "The Plex Media Server configuration location is $Plex_Conf. Is this correct? (y/n)"
+            read confirmation
 
-            if [[ $confirmacao == 'y' ]]; then
-                echo "Configuração do Plex Media Server confirmada."
+            if [[ $confirmation == 'y' ]]; then
+                echo "Plex Media Server configuration confirmed."
                 break
             else
-                echo "Escolha novamente. Digite 1 para pacotes .deb ou apt install plexmediaserver, 2 para snap install plexmediaserver."
-                read escolha
+                echo "Choose again. Type 1 for .deb packages or apt install plexmediaserver, 2 for snap install plexmediaserver."
+                read choice
             fi
-        elif [[ $escolha == '2' ]]; then
-            # Armazenar o caminho /var/snap/plexmediaserver na variável Plex_Conf
+        elif [[ $choice == '2' ]]; then
+            # Store the path /var/snap/plexmediaserver in the Plex_Conf variable
             Plex_Conf="/var/snap/plexmediaserver"
-            echo "O local de configuração do Plex Media Server é $Plex_Conf. Está correto? (y/n)"
-            read confirmacao
+            echo "The Plex Media Server configuration location is $Plex_Conf. Is this correct? (y/n)"
+            read confirmation
 
-            if [[ $confirmacao == 'y' ]]; then
-                echo "Configuração do Plex Media Server confirmada."
+            if [[ $confirmation == 'y' ]]; then
+                echo "Plex Media Server configuration confirmed."
                 break
             else
-                echo "Escolha novamente. Digite 1 para pacotes .deb ou apt install plexmediaserver, 2 para snap install plexmediaserver."
-                read escolha
+                echo "Choose again. Type 1 for .deb packages or apt install plexmediaserver, 2 for snap install plexmediaserver."
+                read choice
             fi
         else
-            echo "Resposta inválida. Por favor, digite 1 para pacotes .deb ou apt install plexmediaserver ou 2 para snap install plexmediaserver."
-            read escolha
+            echo "Invalid response. Please type 1 for .deb packages or apt install plexmediaserver, or 2 for snap install plexmediaserver."
+            read choice
         fi
     done
 else
-    echo "Backup das configurações do Plex Media Server não solicitado."
+    echo "Backup of Plex Media Server configurations not requested."
 fi
 
 { echo "# Configuration for Backup-Restore scripts"
