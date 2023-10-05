@@ -6,6 +6,7 @@
 BackupDir='/mnt/nextcloud_backup'
 NextcloudConfig='/var/www/nextcloud'
 BackupRestoreConf='BackupRestore.conf'
+LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
 
 # Function for error messages
 errorecho() { cat <<< "$@" 1>&2; }
@@ -245,10 +246,8 @@ fi
   echo "# TODO: The directory where the Plex Media Server settings are stored (this directory is stored within /var/lib)"
   echo "Plex_Conf='$Plex_Conf'"
   echo ""
-  echo "# Backup Destinations"
-  echo ""
   echo "# Log File"
-  echo "LOGFILE_PATH='/var/log/'"
+  echo "LogFile='$LogFile'"
 
  } > ./"${BackupRestoreConf}"
 

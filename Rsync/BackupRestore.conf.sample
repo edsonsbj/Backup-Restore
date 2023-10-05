@@ -35,7 +35,13 @@ DBUser='nextcloud_db_user'
 # TODO: The password of the Nextcloud database user
 DBPassword='yourpassword'
 
-# Backup Destinations
+# TODO: The directory where the Emby or Jellyfin settings are stored (this directory is stored within /var/lib)
+Emby_Conf='/var/lib/emby'
+Jellyfin_Conf='/var/lib/jellyfin'
+
+# TODO: The directory where the Plex Media Server settings are stored (this directory is stored within /var/lib)
+Plex_Conf='/var/lib/plexmediaserver'
+# Plex_Conf='/var/lib/plexmediaserver'
 
 # Log File
-LOG_PATH='/var/log/'
+LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'

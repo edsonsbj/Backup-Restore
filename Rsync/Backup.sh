@@ -14,15 +14,15 @@ fi
 # Check if the removable drive is connected and mounted correctly
 if [[ $(lsblk -no UUID /dev/sd*) == *"$UUID"* ]]; then
     echo "########## The drive is connected and mounted. ##########"
-    sudo mount -U $UUID $MOUNT_POINT
+    sudo mount -U $UUID $BackupDir
 else
     echo "########## The drive is not connected or mounted. ##########"
     exit 1
 fi
 
 # Are there write and read permissions?
-[ ! -w "$MOUNT_POINT" ] && {
-  echo "########## No write permissions ##########" >> $LOGFILE_PATH
+[ ! -w "$BackupDir" ] && {
+  echo "########## No write permissions ##########" >> $LogFile
   exit 1
 }
 
@@ -40,47 +40,44 @@ fi
 
 ## ------------------------------------------------------------------------ #
 
-   echo "########## Starting Backup $( date ). ##########" >> $LOGFILE_PATH
+   echo "########## Starting Backup $( date ). ##########" >> $LogFile
 
 # -------------------------------FUNCTIONS----------------------------------------- #
 
 # Function to backup Nextcloud settings
 nextcloud_settings() {
-    echo "############### Backing up Nextcloud settings... ###############" >> $LOGFILE_PATH
+    echo "############### Backing up Nextcloud settings... ###############" >> $LogFile
    	# Enabling Maintenance Mode
-
 	echo
-	sudo -u www-data php $NEXTCLOUD_CONFIG/occ maintenance:mode --on >> $LOGFILE_PATH
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
 	echo
 
 	# Export the database.
+	mysqldump --quick -n --host=$HOSTNAME $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
 
-	mysqldump --quick -n --host=$HOSTNAME $DATABASE_NAME --user=$USER_NAME --password=$PASSWORD > "$NEXTCLOUD_BACKUP/nextclouddb_.sql" >> $LOGFILE_PATH
-
-	sudo rsync -avhP --delete --exclude '*/data/' "$NEXTCLOUD_CONFIG" "$NEXTCLOUD_BACKUP" 1>> $LOGFILE_PATH
+    # Backup
+	sudo rsync -avhP --delete --exclude '*/data/' "$NextcloudConfig" "$BackupDir/Nextcloud" 1>> $LogFile
 
 	# Disabling Nextcloud Maintenance Mode
-
 	echo
-	sudo -u www-data php $NEXTCLOUD_CONFIG/occ maintenance:mode --off >> $LOGFILE_PATH
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off >> $LogFile
 	echo
 }
 
 # Function to backup Nextcloud DATA folder
 nextcloud_data() {
-    echo "############### Backing up Nextcloud DATA folder...###############" >> $LOGFILE_PATH
+    echo "############### Backing up Nextcloud DATA folder...###############" >> $LogFile
 	# Enabling Maintenance Mode
-
 	echo
-	sudo -u www-data php $NEXTCLOUD_CONFIG/occ maintenance:mode --on >> $LOGFILE_PATH
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
 	echo
 
-	sudo rsync -avhP --delete --exclude '*/files_trashbin/' "$NEXTCLOUD_DATA" "$NEXTCLOUD_BACKUP" 1>> $LOGFILE_PATH
+    # Backup
+	sudo rsync -avhP --delete --exclude '*/files_trashbin/' "$NextcloudDataDir" "$BackupDir/Nextcloud_datadir" 1>> $LogFile
 
 	# Disabling Nextcloud Maintenance Mode
-
 	echo
-	sudo -u www-data php $NEXTCLOUD_CONFIG/occ maintenance:mode --off >> $LOGFILE_PATH
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off >> $LogFile
 	echo
 }
 
@@ -93,15 +90,14 @@ nextcloud_complete() {
 
 # Function to backup Emby settings
 emby_settings() {
-    echo "########## Backing up Emby Server settings...##########" >> $LOGFILE_PATH
+    echo "########## Backing up Emby Server settings...##########" >> $LogFile
     # Stop Emby
-
     sudo systemctl stop emby-server.service
 
-    sudo rsync -avhP --delete --exclude '*/cache' --exclude '*/logs' --exclude '*/transcoding-temp' "$EMBY_CONF" "$EMBY_BACKUP" 1>> $LOGFILE_PATH
+    # Backup
+    sudo rsync -avhP --delete --exclude '*/cache' --exclude '*/logs' --exclude '*/transcoding-temp' "$Emby_Conf" "$BackupDir/emby" 1>> $LogFile
  
     # Start Emby
-
     sudo systemctl start emby-server.service
 }
 
@@ -114,15 +110,14 @@ nextcloud_and_emby_settings() {
 
 # Function to backup Jellyfin settings
 jellyfin_settings() {
-    echo "########## Backing up Jellyfin settings...##########" >> $LOGFILE_PATH
-    # Stop Emby
-
+    echo "########## Backing up Jellyfin settings...##########" >> $LogFile
+    # Stop Jellyfin
     sudo systemctl stop jellyfin.service
 
-    sudo rsync -avhP --delete --exclude '*/cache' --exclude '*/logs' --exclude '*/transcoding-temp' "$JELLYFIN_CONF" "$JELLYFIN_BACKUP" 1>> $LOGFILE_PATH
+    # Backup
+    sudo rsync -avhP --delete --exclude '*/cache' --exclude '*/logs' --exclude '*/transcoding-temp' "$Jellyfin_Conf" "$BackupDir/jellyfin" 1>> $LogFile
 
-    # Start Emby
-
+    # Start Jellyfin
     sudo systemctl start jellyfin.service
 }
 
@@ -135,15 +130,14 @@ nextcloud_and_jellyfin_settings() {
 
 # Function to backup Plex settings
 plex_settings() {
-    echo "########## Backing up Plex Media Server settings...##########" >> $LOGFILE_PATH
-    # Stop Emby
-
+    echo "########## Backing up Plex Media Server settings...##########" >> $LogFile
+    # Stop Plex
     sudo systemctl stop plexmediaserver
 
-    sudo rsync -avhP --delete --exclude '*/Cache' --exclude '*/Crash Reports' --exclude '*/Diagnostics' --exclude '*/Logs' "$PLEX_CONF" "$PLEX_BACKUP" 1>> $LOGFILE_PATH
+    # Backup
+    sudo rsync -avhP --delete --exclude '*/Cache' --exclude '*/Crash Reports' --exclude '*/Diagnostics' --exclude '*/Logs' "$Plex_Conf" "$BackupDir/Plex" 1>> $LogFile
 
-    # Start Emby
-
+    # Start Plex
     sudo systemctl start plexmediaserver
 }
 
@@ -202,15 +196,15 @@ if [[ ! -z $1 ]]; then
 else
     # Display the menu to choose the restore option
     echo "Choose a restore option:"
-    echo "	1	>> Backup Nextcloud configurations, database, and data folder."
-    echo "	2	>> Backup Nextcloud configurations and database."
-    echo "	3	>> Backup only the Nextcloud data folder. Useful if the folder is stored elsewhere."
-    echo "	4	>> Backup Emby Media Server settings."
-    echo "	5	>> Backup Nextcloud and Emby Settings."
-    echo "	6	>> Backup Nextcloud settings, database and data folder, as well as Emby settings."
-    echo "	7	>> Backup Jellyfin Settings."
-    echo "	8	>> Backup Nextcloud and Jellyfin Settings."
-    echo "	9	>> Backup Nextcloud settings, database and data folder, as well as Jellyfin settings."
+    echo "	 1	>> Backup Nextcloud configurations, database, and data folder."
+    echo "	 2	>> Backup Nextcloud configurations and database."
+    echo "	 3	>> Backup only the Nextcloud data folder. Useful if the folder is stored elsewhere."
+    echo "	 4	>> Backup Emby Media Server settings."
+    echo "	 5	>> Backup Nextcloud and Emby Settings."
+    echo "	 6	>> Backup Nextcloud settings, database and data folder, as well as Emby settings."
+    echo "	 7	>> Backup Jellyfin Settings."
+    echo "	 8	>> Backup Nextcloud and Jellyfin Settings."
+    echo "	 9	>> Backup Nextcloud settings, database and data folder, as well as Jellyfin settings."
     echo "	10	>> Backup Plex Media Server Settings."
     echo "	11	>> Backup Nextcloud and Plex Media Server Settings."
     echo "	12	>> Backup Nextcloud settings, database and data folder, as well as Plex Media Server settings."
@@ -264,9 +258,9 @@ fi
 
   # Worked well? Unmount.
   [ "$?" = "0" ] && {
-    echo "############## Backup completed. The removable drive has been unmounted and powered off. ###########" >> $LOGFILE_PATH
+    echo "############## Backup completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
  	eval umount /dev/disk/by-uuid/$UUID
-	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$UUID >>$LOGFILE_PATH
+	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$UUID >>$LogFile
     exit 0
   }
 }
