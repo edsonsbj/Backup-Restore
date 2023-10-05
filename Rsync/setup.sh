@@ -85,7 +85,7 @@ clear
 read -p "Do you want to Backup Nextcloud? (Y/n) " nextcloud
 
 # Check user response
-if [[ $nextcloud == "Y" || $nextcloud == "y" ]]; then
+if [[ $nextcloud == "y" || $nextcloud == "y" ]]; then
      echo "Backing up Nextcloud..."
      echo "Enter the path to the Nextcloud file directory."
      echo "Usually: ${NextcloudConfig}"
@@ -213,7 +213,7 @@ fi
 { echo "# Configuration for Backup-Restore scripts"
   echo ""
   echo "# TODO: The uuid of the backup drive"
-  echo "uuid='$uuid'"
+  echo "uuid='$'"
   echo ""
   echo "# TODO: The Backup Drive Mount Point"
   echo "BackupDir='$BackupDir'"

@@ -12,9 +12,9 @@ if [[ $EUID -ne 0 ]]; then
 fi
 
 # Check if the removable drive is connected and mounted correctly
-if [[ $(lsblk -no UUID /dev/sd*) == *"$UUID"* ]]; then
+if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
     echo "########## The drive is connected and mounted. ##########"
-    sudo mount -U $UUID $BackupDir
+    sudo mount -U $uuid $BackupDir
 else
     echo "########## The drive is not connected or mounted. ##########"
     exit 1
@@ -259,8 +259,8 @@ fi
   # Worked well? Unmount.
   [ "$?" = "0" ] && {
     echo "############## Backup completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
- 	eval umount /dev/disk/by-uuid/$UUID
-	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$UUID >>$LogFile
+ 	eval umount /dev/disk/by-uuid/$uuid
+	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$uuid >>$LogFile
     exit 0
   }
 }
