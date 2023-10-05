@@ -52,8 +52,8 @@ nextcloud_settings() {
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
 	echo
 
-	# Stop Apache
-	systemctl stop apache2
+	# Stop Web Server
+	systemctl stop $webserverServiceName
 
 	# Remove the current Nextcloud folder
 	rm -rf "$NextcloudConfig"
@@ -68,8 +68,8 @@ nextcloud_settings() {
 	# Export the database.
 	mysql -u --host=localhost --user=$DBUser --password=$PDBPassword $NextcloudDatabase < "$BackupDir/Nextcloud/nextclouddb.sql" >> $LogFile
 
-	# Start Apache
-	systemctl start apache2
+	# Start Web Server
+	systemctl start $webserverServiceName
 
 	# Disabling Nextcloud Maintenance Mode
 	echo

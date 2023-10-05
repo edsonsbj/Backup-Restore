@@ -52,11 +52,17 @@ nextcloud_settings() {
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
 	echo
 
-	# Export the database.
-	mysqldump --quick -n --host=$HOSTNAME $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
+	# Stop Web Server
+	systemctl stop $webserverServiceName
 
     # Backup
 	sudo rsync -avhP --delete --exclude '*/data/' "$NextcloudConfig" "$BackupDir/Nextcloud" 1>> $LogFile
+
+	# Export the database.
+	mysqldump --quick -n --host=$HOSTNAME $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
+
+	# Start Web Server
+	systemctl start $webserverServiceName
 
 	# Disabling Nextcloud Maintenance Mode
 	echo

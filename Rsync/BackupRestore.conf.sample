@@ -14,6 +14,9 @@ uuid='123456789ABCDEFGH'
 # TODO: The Backup Drive Mount Point
 BackupDir='/mnt/Backup'
 
+# TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')
+webserverServiceName='$webserverServiceName'
+
 # TODO: The directory of your Nextcloud installation (this is a directory under your web root)
 NextcloudConfig='/var/www/nextcloud'
 
