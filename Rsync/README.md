@@ -35,11 +35,14 @@ Keep in mind that the configuration file `BackupRestore.conf` hast to be located
 
 ## Performing Backup or Restoration
 
-Call the 
+Call the script
 
-`sudo ./Backup.sh script`  
+```
+sudo ./Backup.sh
+```  
 
 You can also call this script by cron. Example (at 2am every night.
 
-`0 2 * * * sudo /path/to/scripts/Backup-Restore/Backup.sh'
-
+```
+0 2 * * * sudo /path/to/scripts/Backup-Restore/Backup.sh
+```
