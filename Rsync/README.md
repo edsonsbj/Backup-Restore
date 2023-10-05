@@ -33,4 +33,13 @@ With these scripts, all these elements can be included in a backup.
 
 Keep in mind that the configuration file `BackupRestore.conf` hast to be located in the same directory as the scripts for backup/restore, otherwise the configuration will not be found.
 
+## Performing Backup or Restoration
+
+Call the 
+
+`sudo ./Backup.sh script`  
+
+You can also call this script by cron. Example (at 2am every night.
+
+`0 2 * * * sudo /path/to/scripts/Backup-Restore/Backup.sh'
 
