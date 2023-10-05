@@ -4,9 +4,10 @@
 # Pre defined variables
 #
 BackupDir='/mnt/nextcloud_backup'
-NextcloudConfig='/var/www/nextcloud'
 BackupRestoreConf='BackupRestore.conf'
 LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
+webserverServiceName='nginx'
+NextcloudConfig='/var/www/nextcloud'
 
 # Function for error messages
 errorecho() { cat <<< "$@" 1>&2; }
@@ -95,11 +96,24 @@ if [[ $nextcloud == "y" || $nextcloud == "y" ]]; then
      [ -z "$NEXTCLOUDCONF" ] ||  NextcloudConfig=$NEXTCLOUDCONF
      clear
 
+     echo "Enter the webserver service name."
+     echo "Usually: nginx or apache2"
+     echo ""
+     read -p "Enter an new webserver service name or press ENTER if the webserver service name is ${webserverServiceName}: " WEBSERVERSERVICENAME
+
+     [ -z "$WEBSERVERSERVICENAME" ] ||  webserverServiceName=$WEBSERVERSERVICENAME
+     clear
+
+     echo ""
+     read -p "Should the backed up data be compressed (pigz should be installed in the machine)? [Y/n]: " USECOMPRESSION
+
      NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
      DatabaseSystem=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbtype)
      NextcloudDatabase=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbname)
      DBUser=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbuser)
      DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
+    
+    clear
 
     echo "UUID: ${uuid}"
     echo "BackupDir: ${BackupDir}"
@@ -218,6 +232,9 @@ fi
   echo "# TODO: The Backup Drive Mount Point"
   echo "BackupDir='$BackupDir'"
   echo ""
+  echo "# TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')"
+  echo "webserverServiceName='$webserverServiceName'"
+  echo ""  
   echo "# TODO: The directory of your Nextcloud installation (this is a directory under your web root)"
   echo "NextcloudConfig='$NextcloudConfig'"
   echo ""

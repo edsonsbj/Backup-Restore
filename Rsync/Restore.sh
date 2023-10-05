@@ -61,9 +61,9 @@ nextcloud_settings() {
     # Restore
 	sudo rsync -avhP "$BackupDir/Nextcloud" "$NextcloudConfig" 1>> $LogFile
 
-    # Restore permissions
-    chmod -R 755 $NextcloudConfig
-    chown -R www-data:www-data $NextcloudConfig
+	# Restore permissions
+	chmod -R 755 $NextcloudConfig
+	chown -R www-data:www-data $NextcloudConfig
 
 	# Export the database.
 	mysql -u --host=localhost --user=$DBUser --password=$PDBPassword $NextcloudDatabase < "$BackupDir/Nextcloud/nextclouddb.sql" >> $LogFile
@@ -88,9 +88,9 @@ nextcloud_data() {
     # Restore
 	sudo rsync -avhP "$BackupDir/Nextcloud_datadir" "$NextcloudDataDir" 1>> $LogFile
 
-    # Restore permissions
-    chmod -R 770 $NextcloudDataDir
-    chown -R www-data:www-data $NextcloudDataDir
+	# Restore permissions
+	chmod -R 770 $NextcloudDataDir
+	chown -R www-data:www-data $NextcloudDataDir
 
 	# Disabling Nextcloud Maintenance Mode
 	echo
