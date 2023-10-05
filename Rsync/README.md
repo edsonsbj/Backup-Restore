@@ -1,6 +1,6 @@
 # Backup-Restore
 
-Bash scripts for backup/restore of [Nextcloud](https://nextcloud.com/) [Emby](https://emby.media/) [Jellyfin](https://jellyfin.org/) [Plex](https://www.plex.tv/).
+Bash scripts for backup/restore of [Nextcloud](https://nextcloud.com/) and media servers as [Emby](https://emby.media/) [Jellyfin](https://jellyfin.org/) and [Plex](https://www.plex.tv/) that are installed in the same location.
 
 ## General information
 
