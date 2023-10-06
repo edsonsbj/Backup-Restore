@@ -6,6 +6,7 @@
 BackupDir='/mnt/nextcloud_backup'
 BackupRestoreConf='BackupRestore.conf'
 LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
+script_backup="$(dirname "${BASH_SOURCE[0]}")/Scripts/Backup-Restore/Backup.sh"
 webserverServiceName='nginx'
 NextcloudConfig='/var/www/nextcloud'
 
@@ -83,7 +84,7 @@ read -p "Enter a directory or press ENTER if the backup directory is ${BackupDir
 clear
 
 # Nextcloud Backup
-read -p "Do you want to Backup Nextcloud? (Y/n) " nextcloud
+read -p "Do you want to Backup Nextcloud? (y/n) " nextcloud
 
 # Check user response
 if [[ $nextcloud == "y" || $nextcloud == "y" ]]; then
@@ -104,9 +105,6 @@ if [[ $nextcloud == "y" || $nextcloud == "y" ]]; then
      [ -z "$WEBSERVERSERVICENAME" ] ||  webserverServiceName=$WEBSERVERSERVICENAME
      clear
 
-     echo ""
-     read -p "Should the backed up data be compressed (pigz should be installed in the machine)? [Y/n]: " USECOMPRESSION
-
      NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
      DatabaseSystem=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbtype)
      NextcloudDatabase=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbname)
@@ -114,26 +112,6 @@ if [[ $nextcloud == "y" || $nextcloud == "y" ]]; then
      DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
     
     clear
-
-    echo "UUID: ${uuid}"
-    echo "BackupDir: ${BackupDir}"
-    echo "NextcloudConfig: ${NextcloudConfig}"
-    echo "NextcloudDataDir: ${NextcloudDataDir}"
-
-read -p "Is the information correct? [y/n] " CORRECTINFO
-
-if [ "$CORRECTINFO" != 'y' ] ; then
-  echo ""
-  echo "ABORTING!"
-  echo "No file has been altered."
-  exit 1
-fi
-
-else
-     echo "Nextcloud backup will not be done."
-fi
-
-clear
 
 # Ask the user if they want to backup Emby configurations
 echo "Do you want to backup Emby configurations? (y/n)"
@@ -224,6 +202,30 @@ else
     echo "Backup of Plex Media Server configurations not requested."
 fi
 
+    echo "UUID: ${uuid}"
+    echo "BackupDir: ${BackupDir}"
+    echo "webserverServiceName: ${webserverServiceName}"
+    echo "NextcloudConfig: ${NextcloudConfig}"
+    echo "NextcloudDataDir: ${NextcloudDataDir}"
+    echo "Emby_Conf: ${Emby_Conf}"
+    echo "Jellyfin_Conf ${Jellyfin_Conf}"
+    echo "Plex_Conf: ${Plex_Conf}"
+
+read -p "Is the information correct? [y/n] " CORRECTINFO
+
+if [ "$CORRECTINFO" != 'y' ] ; then
+  echo ""
+  echo "ABORTING!"
+  echo "No file has been altered."
+  exit 1
+fi
+
+else
+     echo "Backup will not be done."
+fi
+
+clear
+
 { echo "# Configuration for Backup-Restore scripts"
   echo ""
   echo "# TODO: The uuid of the backup drive"
@@ -268,7 +270,23 @@ fi
 
  } > ./"${BackupRestoreConf}"
 
+# Ask user about backup time
+echo "Please enter the backup time in 24h format (MM:HH)"
+read time
 
+# Ask the user about the day of the week
+echo "Do you want to run the backup on a specific day of the week? (y/n)"
+read reply_day
+
+if [ "$reply_day" == "s" ]; then
+    echo "Please enter the day of the week (0-6 where 0 is Sunday and 6 is Saturday)"
+    read day_week
+else
+    day_week="*"
+fi
+
+# Add the task to cron
+(crontab -l 2>/dev/null; echo "$time * * $day_week $script_backup") | crontab -
 
 echo ""
 echo "Done!"
