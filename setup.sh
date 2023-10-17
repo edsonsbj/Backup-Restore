@@ -226,49 +226,50 @@ fi
 
 clear
 
-{ echo "# Configuration for Backup-Restore scripts"
-  echo ""
-  echo "# TODO: The uuid of the backup drive"
-  echo "uuid='$'"
-  echo ""
-  echo "# TODO: The Backup Drive Mount Point"
-  echo "BackupDir='$BackupDir'"
-  echo ""
-  echo "# TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')"
-  echo "webserverServiceName='$webserverServiceName'"
-  echo ""  
-  echo "# TODO: The directory of your Nextcloud installation (this is a directory under your web root)"
-  echo "NextcloudConfig='$NextcloudConfig'"
-  echo ""
-  echo "# TODO: The directory of your Nextcloud data directory (outside the Nextcloud file directory)"
-  echo "# If your data directory is located in the Nextcloud files directory (somewhere in the web root),"
-  echo "# the data directory must not be a separate part of the backup"
-  echo "NextcloudDataDir='$NextcloudDataDir'"
-  echo ""
-  echo "# TODO: The name of the database system (one of: mysql, mariadb, postgresql)"
-  echo "# 'mysql' and 'mariadb' are equivalent, so when using 'mariadb', you could also set this variable to 'mysql'" and vice versa.
-  echo "DatabaseSystem='$DatabaseSystem'"
-  echo ""
-  echo "# TODO: Your Nextcloud database name"
-  echo "NextcloudDatabase='$NextcloudDatabase'"
-  echo ""
-  echo "# TODO: Your Nextcloud database user"
-  echo "DBUser='$DBUser'"
-  echo ""
-  echo "# TODO: The password of the Nextcloud database user"
-  echo "DBPassword='$DBPassword'"
-  echo ""
-  echo "# TODO: The directory where the Emby or Jellyfin settings are stored (this directory is stored within /var/lib)"
-  echo "Emby_Conf='$Emby_Conf'"
-  echo "Jellyfin_Conf='$Jellyfin_Conf'"
-  echo ""
-  echo "# TODO: The directory where the Plex Media Server settings are stored (this directory is stored within /var/lib)"
-  echo "Plex_Conf='$Plex_Conf'"
-  echo ""
-  echo "# Log File"
-  echo "LogFile='$LogFile'"
+tee -a ./"${BackupRestoreConf}" <<EOF
+# Configuration for Backup-Restore scripts
 
- } > ./"${BackupRestoreConf}"
+# TODO: The uuid of the backup drive
+uuid='$uuid'
+
+# TODO: The Backup Drive Mount Point
+BackupDir='$BackupDir'
+
+# TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')
+webserverServiceName='$webserverServiceName'
+
+# TODO: The directory of your Nextcloud installation (this is a directory under your web root)
+NextcloudConfig='/var/www/nextcloud'
+
+# TODO: The directory of your Nextcloud data directory (outside the Nextcloud file directory)
+# If your data directory is located in the Nextcloud files directory (somewhere in the web root),
+# the data directory must not be a separate part of the backup
+NextcloudDataDir='$NextcloudDataDir'
+
+# TODO: The name of the database system (one of: mysql, mariadb, postgresql)
+# 'mysql' and 'mariadb' are equivalent, so when using 'mariadb', you could also set this variable to 'mysql' and vice versa.
+DatabaseSystem='$DatabaseSystem'
+
+# TODO: Your Nextcloud database name
+NextcloudDatabase='$NextcloudDatabase'
+
+# TODO: Your Nextcloud database user
+DBUser='$DBUser'
+
+# TODO: The password of the Nextcloud database user
+DBPassword='$DBPassword'
+
+# TODO: The directory where the Emby or Jellyfin settings are stored (this directory is stored within /var/lib)
+Emby_Conf='$Emby_Conf'
+Jellyfin_Conf='$Jellyfin_Conf'
+
+# TODO: The directory where the Plex Media Server settings are stored (this directory is stored within /var/lib)
+Plex_Conf='$Plex_Conf'
+
+# Log File
+LogFile='$LogFile'
+
+EOF
 
 # Ask user about backup time
 echo "Please enter the backup time in 24h format (MM:HH)"
