@@ -120,7 +120,7 @@ BackupDir='$SourceDir'
 BackupDir='$BackupDir'
 
 # Log File
-LogFile='$LogFile'
+LogFile="$LogFile"
 
 EOF
 
@@ -310,7 +310,7 @@ MediaserverService='$MediaserverService'
 MediaserverConf='$MediaserverConf'
 
 # Log File
-LogFile='$LogFile'
+LogFile="$LogFile"
 
 EOF
 
@@ -444,7 +444,7 @@ MediaserverService='$MediaserverService'
 MediaserverConf='$MediaserverConf'
 
 # Log File
-LogFile='$LogFile'
+LogFile="$LogFile"
 
 EOF
 
