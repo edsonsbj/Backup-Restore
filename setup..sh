@@ -15,6 +15,7 @@ Emby_Conf='/var/lib/emby' # Diretório de configuração do Emby
 Jellyfin_Conf='/var/lib/jellyfin' # Diretório de configuração do Jellyfin
 Mediaserver_Conf=''
 MediaserverService=''
+MediaserverUser=''
 
 #############################################################################################
 #################################### TESTS ##################################################
@@ -247,6 +248,8 @@ configure_mediaserver() {
     case $media_server in
       "Emby")
         MediaserverService="emby"
+        MediaserverUser="emby"
+
         echo "Enter the path to the Emby file directory."
         echo "Usually: ${Emby_Conf}"
         echo ""
@@ -260,6 +263,8 @@ configure_mediaserver() {
         ;;
       "Jellyfin")
         MediaserverService="jellyfin"
+        MediaserverUser="jellyfin"
+
         echo "Enter the path to the Jellyfin file directory."
         echo "Usually: ${Jellyfin_Conf}"
         echo ""
@@ -273,6 +278,7 @@ configure_mediaserver() {
         ;;
       "Plex")
         MediaserverService="plexmediaserver"
+        MediaserverUser="plex"
 
         echo "Enter the path to the Jellyfin file directory."
         echo "Usually: ${Plex_Conf}"
@@ -307,6 +313,9 @@ BackupDir='$BackupDir'
 
 # TODO: The service name of the media server. Used to start/stop web server (e.g. 'systemctl start <mediaserverServiceName>')
 MediaserverService='$MediaserverService'
+
+# TODO: The service name of the media server. Used to restore permissions media server settings)
+MediaserverUser='$MediaserUser'
 
 # TODO: The directory where the Media Server settings are stored (this directory is stored within /var/lib)
 MediaserverConf='$MediaserverConf'
@@ -357,6 +366,8 @@ configure_nextcloud_mediaserver() {
     case $media_server in
       "Emby")
         MediaserverService="emby"
+        MediaserverUser="emby"
+
         echo "Enter the path to the Emby file directory."
         echo "Usually: ${Emby_Conf}"
         echo ""
@@ -370,6 +381,8 @@ configure_nextcloud_mediaserver() {
         ;;
       "Jellyfin")
         MediaserverService="jellyfin"
+        MediaserverUser="jellyfin"
+
         echo "Enter the path to the Jellyfin file directory."
         echo "Usually: ${Jellyfin_Conf}"
         echo ""
@@ -383,6 +396,7 @@ configure_nextcloud_mediaserver() {
         ;;
       "Plex")
         MediaserverService="plexmediaserver"
+        MediaserverUser="emby"
 
         echo "Enter the path to the Jellyfin file directory."
         echo "Usually: ${Plex_Conf}"
@@ -441,6 +455,9 @@ DBPassword='$DBPassword'
 
 # TODO: The service name of the media server. Used to start/stop web server (e.g. 'systemctl start <mediaserverServiceName>')
 MediaserverService='$MediaserverService'
+
+# TODO: The service name of the media server. Used to restore permissions media server settings)
+MediaserverUser='$MediaserUser'
 
 # TODO: The directory where the Media Server settings are stored (this directory is stored within /var/lib)
 MediaserverConf='$MediaserverConf'
