@@ -469,8 +469,9 @@ EOF
 
   clear
 
-  wget https://raw.githubusercontent.com/edsonsbj/Backup_Restore_Rsync/main/Backup.sh
-
+  wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Nextcloud%20%2B%20Media%20server%20/Backup.sh
+  wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Nextcloud%20%2B%20Media%20server%20/Restore.sh
+  
   chmod 700 *.sh
 
   ln -s ./Scripts/Backup.sh /usr/local/bin/Backup.sh
