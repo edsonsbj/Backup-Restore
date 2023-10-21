@@ -94,66 +94,6 @@ nextcloud_complete() {
     nextcloud_data
 }
 
-# Function to backup Emby settings
-emby_settings() {
-    echo "########## Backing up Emby Server settings...##########" >> $LogFile
-    # Stop Emby
-    sudo systemctl stop emby-server.service
-
-    # Backup
-    sudo rsync -avhP --delete --exclude '*/cache' --exclude '*/logs' --exclude '*/transcoding-temp' "$Emby_Conf" "$BackupDir/emby" 1>> $LogFile
- 
-    # Start Emby
-    sudo systemctl start emby-server.service
-}
-
-# Function to backup Emby Media Server and Nextcloud settings
-nextcloud_and_emby_settings() {
-    echo "########## Backing up Emby Media Server and Nextcloud settings...##########"
-    nextcloud_settings
-    emby_settings
-}
-
-# Function to backup Jellyfin settings
-jellyfin_settings() {
-    echo "########## Backing up Jellyfin settings...##########" >> $LogFile
-    # Stop Jellyfin
-    sudo systemctl stop jellyfin.service
-
-    # Backup
-    sudo rsync -avhP --delete --exclude '*/cache' --exclude '*/logs' --exclude '*/transcoding-temp' "$Jellyfin_Conf" "$BackupDir/jellyfin" 1>> $LogFile
-
-    # Start Jellyfin
-    sudo systemctl start jellyfin.service
-}
-
-# Function to backup Jellyfin and Nextcloud settings
-nextcloud_and_jellyfin_settings() {
-    echo "########## Backing up Jellyfin and Nextcloud settings...##########"
-    nextcloud_settings
-    jellyfin_settings
-}
-
-# Function to backup Plex settings
-plex_settings() {
-    echo "########## Backing up Plex Media Server settings...##########" >> $LogFile
-    # Stop Plex
-    sudo systemctl stop plexmediaserver
-
-    # Backup
-    sudo rsync -avhP --delete --exclude '*/Cache' --exclude '*/Crash Reports' --exclude '*/Diagnostics' --exclude '*/Logs' "$Plex_Conf" "$BackupDir/Plex" 1>> $LogFile
-
-    # Start Plex
-    sudo systemctl start plexmediaserver
-}
-
-# Function to backup Plex Media Server and Nextcloud settings
-nextcloud_and_plex_settings() {
-    echo "########## Backing up Plex Media Server and Nextcloud settings...##########"
-    nextcloud_settings
-    plex_settings
-}
-
 # Check if an option was passed as an argument
 if [[ ! -z $1 ]]; then
     # Execute the corresponding restore option
@@ -167,33 +107,6 @@ if [[ ! -z $1 ]]; then
         3)
             nextcloud_data
             ;;
-        4)
-            emby_settings
-            ;;
-        5)
-            nextcloud_and_emby_settings
-            ;;
-        6)
-            nextcloud_complete_and_emby_settings
-            ;;
-        7)
-            jellyfin_settings
-            ;;
-        8)
-            nextcloud_and_jellyfin_settings
-            ;;
-        9)
-            nextcloud_complete_and_jellyfin_settings
-            ;;
-        10)
-            plex_settings
-            ;;
-        11)
-            nextcloud_and_plex_settings
-            ;;
-        12)
-            nextcloud_complete_and_plex_settings
-            ;;
         *)
             echo "Invalid option!"
             ;;
@@ -205,15 +118,6 @@ else
     echo "	 1	>> Backup Nextcloud configurations, database, and data folder."
     echo "	 2	>> Backup Nextcloud configurations and database."
     echo "	 3	>> Backup only the Nextcloud data folder. Useful if the folder is stored elsewhere."
-    echo "	 4	>> Backup Emby Media Server settings."
-    echo "	 5	>> Backup Nextcloud and Emby Settings."
-    echo "	 6	>> Backup Nextcloud settings, database and data folder, as well as Emby settings."
-    echo "	 7	>> Backup Jellyfin Settings."
-    echo "	 8	>> Backup Nextcloud and Jellyfin Settings."
-    echo "	 9	>> Backup Nextcloud settings, database and data folder, as well as Jellyfin settings."
-    echo "	10	>> Backup Plex Media Server Settings."
-    echo "	11	>> Backup Nextcloud and Plex Media Server Settings."
-    echo "	12	>> Backup Nextcloud settings, database and data folder, as well as Plex Media Server settings."
 
     # Read the option entered by the user
     read option
@@ -228,33 +132,6 @@ else
             ;;
         3)
             nextcloud_data
-            ;;
-        4)
-            emby_settings
-            ;;
-        5)
-            nextcloud_and_emby_settings
-            ;;
-        6)
-            nextcloud_complete_and_emby_settings
-            ;;
-        7)
-            jellyfin_settings
-            ;;
-        8)
-            nextcloud_and_jellyfin_settings
-            ;;
-        9)
-            nextcloud_complete_and_jellyfin_settings
-            ;;
-        10)
-            plex_settings
-            ;;
-        11)
-            nextcloud_and_plex_settings
-            ;;
-        12)
-            nextcloud_complete_and_plex_settings
             ;;
         *)
             echo "Invalid option!"

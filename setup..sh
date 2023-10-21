@@ -205,7 +205,7 @@ EOF
 
   clear
 
-  wget https://github.com/edsonsbj/Backup_Restore_Rsync/blob/main/Nextcloud/backup.sh
+  wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Nextcloud/Backup.sh
 
   chmod 700 *.sh
 
