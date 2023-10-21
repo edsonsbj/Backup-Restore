@@ -284,7 +284,7 @@ configure_mediaserver() {
         break
         ;;
       *)
-        Echo "Invalid option, try again."
+        echo "Invalid option, try again."
         ;;
     esac
   done
