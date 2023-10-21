@@ -29,7 +29,7 @@ fi
 echo "Changing to the root directory..."
 cd /
 echo "pwd is $(pwd)"
-echo "backup file location db is " '/'
+echo "restore file location db is " '/'
 
 if [ $? -eq 0 ]; then
     echo "Done"
@@ -38,17 +38,15 @@ else
     exit 1
 fi
 
-clear 
-
 ## ------------------------------------------------------------------------ #
 
-   echo "########## Starting Backup $( date ). ##########" >> $LogFile
+   echo "########## Restoration Started $( date ). ##########" >> $LogFile
 
 # -------------------------------FUNCTIONS----------------------------------------- #
 
-# Function to backup Nextcloud settings
+# Function to restore Nextcloud settings
 nextcloud_settings() {
-    echo "############### Backing up Nextcloud settings... ###############" >> $LogFile
+    echo "############### Restoring Nextcloud settings... ###############" >> $LogFile
    	# Enabling Maintenance Mode
 	echo
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
@@ -57,11 +55,18 @@ nextcloud_settings() {
 	# Stop Web Server
 	systemctl stop $webserverServiceName
 
-    # Backup
-	sudo rsync -avhP --delete --exclude '*/data/' "$NextcloudConfig" "$BackupDir/Nextcloud" 1>> $LogFile
+	# Remove the current Nextcloud folder
+	rm -rf "$NextcloudConfig"
+
+    # Restore
+	sudo rsync -avhP "$BackupDir/Nextcloud" "$NextcloudConfig" 1>> $LogFile
+
+	# Restore permissions
+	chmod -R 755 $NextcloudConfig
+	chown -R www-data:www-data $NextcloudConfig
 
 	# Export the database.
-	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
+	mysql -u --host=localhost --user=$DBUser --password=$PDBPassword $NextcloudDatabase < "$BackupDir/Nextcloud/nextclouddb.sql" >> $LogFile
 
 	# Start Web Server
 	systemctl start $webserverServiceName
@@ -72,16 +77,20 @@ nextcloud_settings() {
 	echo
 }
 
-# Function to backup Nextcloud DATA folder
+# Function to restore Nextcloud DATA folder
 nextcloud_data() {
-    echo "############### Backing up Nextcloud DATA folder...###############" >> $LogFile
+    echo "############### Restoring Nextcloud DATA folder...###############" >> $LogFile
 	# Enabling Maintenance Mode
 	echo
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
 	echo
 
-    # Backup
-	sudo rsync -avhP --delete --exclude '*/files_trashbin/' "$NextcloudDataDir" "$BackupDir/Nextcloud_datadir" 1>> $LogFile
+    # Restore
+	sudo rsync -avhP "$BackupDir/Nextcloud_datadir" "$NextcloudDataDir" 1>> $LogFile
+
+	# Restore permissions
+	chmod -R 770 $NextcloudDataDir
+	chown -R www-data:www-data $NextcloudDataDir
 
 	# Disabling Nextcloud Maintenance Mode
 	echo
@@ -89,16 +98,16 @@ nextcloud_data() {
 	echo
 }
 
-# Function to perform a complete Nextcloud backup
+# Function to perform a complete Nextcloud restore
 nextcloud_complete() {
-    echo "########## Performing complete Nextcloud backup...##########"
+    echo "########## Performing complete Nextcloud restore...##########"
     nextcloud_settings
     nextcloud_data
 }
 
 # Check if an option was passed as an argument
 if [[ ! -z $1 ]]; then
-    # Execute the corresponding Backup option
+    # Execute the corresponding restore option
     case $1 in
         1)
             nextcloud_complete
@@ -109,23 +118,26 @@ if [[ ! -z $1 ]]; then
         3)
             nextcloud_data
             ;;
+        4)
+            emby_settings
+            ;;
         *)
             echo "Invalid option!"
             ;;
     esac
 
 else
-    # Display the menu to choose the Backup option
-    echo "Choose a Backup option:"
-    echo "1. Backup Nextcloud configurations, database, and data folder."
-    echo "2. Backup Nextcloud configurations and database."
-    echo "3. Backup only the Nextcloud data folder. Useful if the folder is stored elsewhere."
+    # Display the menu to choose the Restore option
+    echo "Choose a Restore option:"
+    echo "1. Restore Nextcloud configurations, database, and data folder."
+    echo "2. Restore Nextcloud configurations and database."
+    echo "3. Restore only the Nextcloud data folder. Useful if the folder is stored elsewhere."
     echo "4. To go out."
 
     # Read the option entered by the user
     read option
 
-    # Execute the corresponding Backup option
+    # Execute the corresponding restore option
     case $option in
         1)
             nextcloud_complete
@@ -139,7 +151,6 @@ else
         4)
             echo "Leaving the script."
             exit 0
-            ;;            
         *)
             echo "Invalid option!"
             ;;
@@ -148,7 +159,7 @@ fi
 
   # Worked well? Unmount.
   [ "$?" = "0" ] && {
-    echo "############## Backup completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
+    echo "############## Restore completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
  	eval umount /dev/disk/by-uuid/$uuid
 	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$uuid >>$LogFile
     exit 0
