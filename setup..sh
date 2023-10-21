@@ -60,9 +60,9 @@ disk_backup() {
     exit 1
   fi
  
-  # Verifique se o número de partição está dentro do intervalo válido
+  # Check that the partition number is within the valid interval
   if [ "$partition_number" -lt 1 ] || [ "$partition_number" -gt "$num_partitions" ]; then
-    echo "Número de partição fora do intervalo válido."
+    echo "Partition number outside the valid interval."
     exit 1
   fi
  
@@ -238,9 +238,9 @@ clear
 (crontab -l 2>/dev/null; echo "$time * * $day_week backup") | crontab -
 }
 
-# Função para configurar o servidor de mídia
+# Function to configure the media server
 configure_mediaserver() {
-  echo "Escolha o servidor de mídia para backup:"
+  echo "Choose the media server for backup:"
   select media_server in "Emby" "Jellyfin" "Plex"; do
     case $media_server in
       "Emby")
@@ -284,7 +284,7 @@ configure_mediaserver() {
         break
         ;;
       *)
-        echo "Opção inválida, tente novamente."
+        Echo "Invalid option, try again."
         ;;
     esac
   done
@@ -326,7 +326,7 @@ EOF
 
 }
 
-# Função para configurar o servidor de mídia com o Nextcloud
+# Function to configure the media server with NextCloud
 configure_nextcloud_mediaserver() {
   echo "Enter the path to the Nextcloud file directory."
   echo "Usually: ${NextcloudConfig}"
@@ -350,7 +350,7 @@ configure_nextcloud_mediaserver() {
   DBUser=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbuser)
   DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
 
-  echo "Escolha o servidor de mídia para backup:"
+  echo "Choose the Backup Media Server: "
   select media_server in "Emby" "Jellyfin" "Plex"; do
     case $media_server in
       "Emby")
@@ -394,7 +394,7 @@ configure_nextcloud_mediaserver() {
         break
         ;;
       *)
-        echo "Opção inválida, tente novamente."
+        echo "Invalid option, try again."
         ;;
     esac
   done
@@ -460,14 +460,14 @@ EOF
 
 }
 
-# Menu principal
+# Main menu
 while true; do
-  echo "Escolha uma opção:"
+  echo "Choose an option:"
   echo "1. Backup"
   echo "2. Backup Nextcloud"
   echo "3. Backup Media Server"
   echo "4. Backup Nextcloud + Media Server"
-  echo "5. Sair"
+  echo "5. To go out"
 
   read choice
 
@@ -501,3 +501,9 @@ while true; do
       ;;
   esac
 done
+
+echo ""
+echo "Done!"
+echo ""
+echo ""
+echo "IMPORTANT: Please check $BackupRestoreConf if all variables were set correctly BEFORE running the backup/restore scripts!"
