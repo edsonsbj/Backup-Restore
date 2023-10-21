@@ -199,7 +199,7 @@ DBUser='$DBUser'
 DBPassword='$DBPassword'
 
 # Log File
-LogFile='$LogFile'
+LogFile="$LogFile"
 
 EOF
 

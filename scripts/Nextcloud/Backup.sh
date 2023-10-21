@@ -1,6 +1,6 @@
 #!/bin/bash
 
-CONFIG="$(dirname "${BASH_SOURCE[0]}")/.conf"
+CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
 . $CONFIG
 
 ## ---------------------------------- TESTS ------------------------------ #
@@ -38,6 +38,8 @@ else
     exit 1
 fi
 
+clear 
+
 ## ------------------------------------------------------------------------ #
 
    echo "########## Starting Backup $( date ). ##########" >> $LogFile
@@ -59,7 +61,7 @@ nextcloud_settings() {
 	sudo rsync -avhP --delete --exclude '*/data/' "$NextcloudConfig" "$BackupDir/Nextcloud" 1>> $LogFile
 
 	# Export the database.
-	mysqldump --quick -n --host=$HOSTNAME $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
+	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
 
 	# Start Web Server
 	systemctl start $webserverServiceName
@@ -115,9 +117,10 @@ if [[ ! -z $1 ]]; then
 else
     # Display the menu to choose the restore option
     echo "Choose a restore option:"
-    echo "	 1	>> Backup Nextcloud configurations, database, and data folder."
-    echo "	 2	>> Backup Nextcloud configurations and database."
-    echo "	 3	>> Backup only the Nextcloud data folder. Useful if the folder is stored elsewhere."
+    echo "1. Backup Nextcloud configurations, database, and data folder."
+    echo "2. Backup Nextcloud configurations and database."
+    echo "3. Backup only the Nextcloud data folder. Useful if the folder is stored elsewhere."
+    echo "4. To go out
 
     # Read the option entered by the user
     read option
@@ -133,6 +136,10 @@ else
         3)
             nextcloud_data
             ;;
+        5)
+            echo "Leaving the script."
+            exit 0
+            ;;            
         *)
             echo "Invalid option!"
             ;;
