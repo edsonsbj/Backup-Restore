@@ -493,11 +493,11 @@ while true; do
       cron
       ;;
     5)
-      echo "Saindo do script."
+      echo "Leaving the script."
       exit 0
       ;;
     *)
-      echo "Opção inválida, tente novamente."
+      echo "Invalid option, try again."
       ;;
   esac
 done
