@@ -3,95 +3,85 @@
 CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
 . $CONFIG
 
+# Create a log file to record command outputs
+touch "$LogFile"
+exec > >(tee -a "$LogFile")
+exec 2>&1
+
 ## ---------------------------------- TESTS ------------------------------ #
 
 # Check if the script is being executed by root or with sudo
 if [[ $EUID -ne 0 ]]; then
-   echo "########## This script needs to be executed as root or with sudo. ##########" 
+   echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
 
 # Check if the removable drive is connected and mounted correctly
 if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
-    echo "########## The drive is connected and mounted. ##########"
-    sudo mount -U $uuid $BackupDir
+    echo "========== The drive is connected and mounted. =========="
 else
-    echo "########## The drive is not connected or mounted. ##########"
-    exit 1
+    echo "========== The drive is not connected or mounted. =========="
+
+    # Try to mount the drive
+    sudo mount -U $uuid $BackupDir 2>/dev/null
+
+    # Check if the drive is now mounted
+    if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
+        echo "========== The drive has been successfully mounted. =========="
+    else
+        echo "========== Failed to mount the drive. Exiting script. =========="
+        exit 1
+    fi
 fi
 
 # Are there write and read permissions?
-[ ! -w "$BackupDir" ] && {
-  echo "########## No write permissions ##########" >> $LogFile
-  exit 1
-}
-
-echo "Changing to the root directory..."
-cd /
-echo "pwd is $(pwd)"
-echo "backup file location db is " '/'
-
-if [ $? -eq 0 ]; then
-    echo "Done"
-else
-    echo "failed to change to root directory. Restoration failed"
+if [ ! -w "$BackupDir" ]; then
+    echo "========== No write permissions =========="
     exit 1
 fi
-
-clear 
-
-## ------------------------------------------------------------------------ #
-
-   echo "########## Starting Backup $( date ). ##########" >> $LogFile
 
 # -------------------------------FUNCTIONS----------------------------------------- #
 
 # Function to backup Nextcloud settings
 nextcloud_settings() {
-    echo "############### Backing up Nextcloud settings... ###############" >> $LogFile
-   	# Enabling Maintenance Mode
-	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
-	echo
+    echo "========== Backing up Nextcloud settings $( date )... =========="
+   	
+    # Enabling Maintenance Mode
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
 
 	# Stop Web Server
 	systemctl stop $webserverServiceName
 
     # Backup
-	sudo rsync -avhP --delete --exclude '*/data/' "$NextcloudConfig" "$BackupDir/Nextcloud" 1>> $LogFile
+	sudo rsync -avhP --delete --exclude '*/data/' "$NextcloudConfig" "$BackupDir/Nextcloud"
 
 	# Export the database.
-	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql" >> $LogFile
+	mysqldump --quick -n --host=localhost $NextcloudDatabase --user=$DBUser --password=$DBPassword > "$BackupDir/Nextcloud/nextclouddb_.sql"
 
 	# Start Web Server
 	systemctl start $webserverServiceName
 
 	# Disabling Nextcloud Maintenance Mode
-	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off >> $LogFile
-	echo
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off
 }
 
 # Function to backup Nextcloud DATA folder
 nextcloud_data() {
-    echo "############### Backing up Nextcloud DATA folder...###############" >> $LogFile
+    echo "========== Backing up Nextcloud DATA folder $( date )...=========="
+
 	# Enabling Maintenance Mode
-	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
-	echo
+
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
 
     # Backup
-	sudo rsync -avhP --delete --exclude '*/files_trashbin/' "$NextcloudDataDir" "$BackupDir/Nextcloud_datadir" 1>> $LogFile
+	sudo rsync -avhP --delete --exclude '*/files_trashbin/' "$NextcloudDataDir" "$BackupDir/Nextcloud_datadir"
 
 	# Disabling Nextcloud Maintenance Mode
-	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off >> $LogFile
-	echo
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off
 }
 
 # Function to perform a complete Nextcloud backup
 nextcloud_complete() {
-    echo "########## Performing complete Nextcloud backup...##########"
     nextcloud_settings
     nextcloud_data
 }
@@ -146,11 +136,10 @@ else
     esac
 fi
 
-  # Worked well? Unmount.
-  [ "$?" = "0" ] && {
-    echo "############## Backup completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
- 	eval umount /dev/disk/by-uuid/$uuid
-	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$uuid >>$LogFile
+# Worked well? Unmount.
+if [ "$?" = "0" ]; then
+    echo "========== Backup completed. The removable drive has been unmounted and powered off. =========="
+    umount "/dev/disk/by-uuid/$uuid"
+    sudo udisksctl power-off -b "/dev/disk/by-uuid/$uuid"
     exit 0
-  }
-}
+fi
