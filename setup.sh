@@ -10,6 +10,7 @@ LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
 SourceDir='/'
 webserverServiceName='nginx'
 NextcloudConfig='/var/www/nextcloud'
+script_backup=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)/Scripts/Backup.sh
 Plex_Conf='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server' # Diretório de configuração do Plex
 Emby_Conf='/var/lib/emby' # Diretório de configuração do Emby
 Jellyfin_Conf='/var/lib/jellyfin' # Diretório de configuração do Jellyfin
@@ -236,7 +237,7 @@ fi
 clear
 
 # Add the task to cron
-(crontab -l 2>/dev/null; echo "$time * * $day_week backup") | crontab -
+(crontab -l 2>/dev/null; echo "$time * * $day_week $script_backup") | crontab -
 }
 
 # Function to configure the media server
@@ -313,7 +314,7 @@ BackupDir='$BackupDir'
 MediaserverService='$MediaserverService'
 
 # TODO: The service name of the media server. Used to restore permissions media server settings)
-MediaserverUser='$MediaserUser'
+MediaserverUser='$MediaserverUser'
 
 # TODO: The directory where the Media Server settings are stored (this directory is stored within /var/lib)
 MediaserverConf='$MediaserverConf'
@@ -454,7 +455,7 @@ DBPassword='$DBPassword'
 MediaserverService='$MediaserverService'
 
 # TODO: The service name of the media server. Used to restore permissions media server settings)
-MediaserverUser='$MediaserUser'
+MediaserverUser='$MediaserverUser'
 
 # TODO: The directory where the Media Server settings are stored (this directory is stored within /var/lib)
 MediaserverConf='$MediaserverConf'
