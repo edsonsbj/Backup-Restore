@@ -3,67 +3,65 @@
 CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
 . $CONFIG
 
-## ---------------------------------- TESTS ------------------------------ #
+## ---------------------------- TESTS ---------------------------- #
 
 # Check if the script is being executed by root or with sudo
 if [[ $EUID -ne 0 ]]; then
-   echo "########## This script needs to be executed as root or with sudo. ##########" 
+   echo "This script needs to be executed as root or with sudo."
    exit 1
 fi
 
 # Check if the removable drive is connected and mounted correctly
-if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
-    echo "########## The drive is connected and mounted. ##########"
+if lsblk -no uuid /dev/sd* | grep -q "$uuid"; then
+    echo "The drive is connected and mounted."
     sudo mount -U $uuid $BackupDir
 else
-    echo "########## The drive is not connected or mounted. ##########"
+    echo "The drive is not connected or mounted."
     exit 1
 fi
 
-# Are there write and read permissions?
-[ ! -w "$BackupDir" ] && {
-  echo "########## No write permissions ##########" >> $LogFile
+# Check for write and read permissions
+if [ ! -w "$BackupDir" ]; then
+  echo "No write permissions in $BackupDir"
   exit 1
-}
+fi
 
 echo "Changing to the root directory..."
 cd /
-echo "pwd is $(pwd)"
-echo "backup file location db is " '/'
-
 if [ $? -eq 0 ]; then
-    echo "Done"
+    echo "Changed to the root directory successfully."
 else
-    echo "failed to change to root directory. Restoration failed"
+    echo "Failed to change to the root directory. Restoration failed."
     exit 1
 fi
 
 clear
 
-## ------------------------------------------------------------------------ #
+## -------------------------- MAIN SCRIPT -------------------------- #
 
-   echo "########## Starting Backup $( date ). ##########" >> $LogFile
+echo "Starting Backup $(date)..." >> "$LogFile"
 
-# -------------------------------FUNCTIONS----------------------------------------- #
-
-# Function to backup 
+# Function to backup
 backup() {
-    echo "########## Backing up Media Server settings...##########" >> $LogFile
+    echo "Backing up Media Server settings..." >> "$LogFile"
 
     # Stop Media Server
-    sudo systemctl stop $MediaserverService
+    systemctl stop "$MediaserverService"
 
     # Backup
     sudo rsync -avhP --delete --exclude={'*/Cache','*/cache','*/Crash Reports','*/Diagnostics','*/Logs','*/logs','*/transcoding-temp'} "$MediaserverConf" "$BackupDir/Mediaserver" 1>> $LogFile
 
     # Start Media Server
-    sudo systemctl start $MediaserverService
+    systemctl start "$MediaserverService"
+    
+    # Worked well? Unmount.
+    if [ $? -eq 0 ]; then
+        echo "Backup completed. The removable drive has been unmounted and powered off." >> "$LogFile"
+        umount "/dev/disk/by-uuid/$uuid"
+        sudo udisksctl power-off -b "/dev/disk/by-uuid/$uuid" >> "$LogFile"
+        exit 0
+    fi
 }
-  # Worked well? Unmount.
-  [ "$?" = "0" ] && {
-    echo "############## Backup completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
- 	eval umount /dev/disk/by-uuid/$uuid
-	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$uuid >>$LogFile
-    exit 0
-  }
-}
+
+# Call the backup function
+backup
