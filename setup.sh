@@ -114,8 +114,8 @@ backup() {
 # TODO: The uuid of the backup drive
 uuid='$uuid'
 
-# TODO: The Backup Drive Mount Point
-BackupDir='$SourceDir'
+# TODO: Directory to backup 
+SourceDir='$SourceDir'
 
 # TODO: The Backup Drive Mount Point
 BackupDir='$BackupDir'
@@ -131,8 +131,6 @@ EOF
   wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/Restore.sh
 
   chmod 700 *.sh
-
-  ln -s /Scripts/Backup.sh /usr/local/bin/Backup.sh
 
   clear
 
@@ -156,11 +154,11 @@ nextcloud() {
   [ -z "$WEBSERVERSERVICENAME" ] ||  webserverServiceName=$WEBSERVERSERVICENAME
   clear
 
-  NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
-  DatabaseSystem=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbtype)
-  NextcloudDatabase=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbname)
-  DBUser=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbuser)
-  DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
+  NextcloudDataDir=$(sudo -u www-data php $NextcloudConfig/occ config:system:get datadirectory)
+  DatabaseSystem=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbtype)
+  NextcloudDatabase=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbname)
+  DBUser=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbuser)
+  DBPassword=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbpassword)
     
   clear
 
@@ -331,8 +329,6 @@ EOF
 
   chmod 700 *.sh
 
-  ln -s ./Scripts/Backup.sh /usr/local/bin/Backup.sh
-
   clear
 
 }
@@ -355,11 +351,11 @@ configure_nextcloud_mediaserver() {
   [ -z "$WEBSERVERSERVICENAME" ] ||  webserverServiceName=$WEBSERVERSERVICENAME
   clear
 
-  NextcloudDataDir=$(sudo -u www-data $NextcloudConfig/occ config:system:get datadirectory)
-  DatabaseSystem=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbtype)
-  NextcloudDatabase=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbname)
-  DBUser=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbuser)
-  DBPassword=$(sudo -u www-data $NextcloudConfig/occ config:system:get dbpassword)
+  NextcloudDataDir=$(sudo -u www-data php $NextcloudConfig/occ config:system:get datadirectory)
+  DatabaseSystem=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbtype)
+  NextcloudDatabase=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbname)
+  DBUser=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbuser)
+  DBPassword=$(sudo -u www-data php $NextcloudConfig/occ config:system:get dbpassword)
 
   echo "Choose the Backup Media Server: "
   select media_server in "Emby" "Jellyfin" "Plex"; do
@@ -396,7 +392,7 @@ configure_nextcloud_mediaserver() {
         ;;
       "Plex")
         MediaserverService="plexmediaserver"
-        MediaserverUser="emby"
+        MediaserverUser="plwx"
 
         echo "Enter the path to the Jellyfin file directory."
         echo "Usually: ${Plex_Conf}"
@@ -473,8 +469,6 @@ EOF
   wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Nextcloud%20%2B%20Media%20server%20/Restore.sh
   
   chmod 700 *.sh
-
-  ln -s ./Scripts/Backup.sh /usr/local/bin/Backup.sh
 
   clear
 

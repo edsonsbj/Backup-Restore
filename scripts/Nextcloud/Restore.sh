@@ -56,7 +56,7 @@ nextcloud_settings() {
 	systemctl stop $webserverServiceName
 
 	# Remove the current Nextcloud folder
-	rm -rf "$NextcloudConfig"
+	mv "$NextcloudConfig" "$NextcloudConfig.bk"
 
     # Restore
 	sudo rsync -avhP "$BackupDir/Nextcloud" "$NextcloudConfig" 1>> $LogFile

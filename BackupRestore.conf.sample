@@ -14,6 +14,9 @@ uuid='123456789ABCDEFGH'
 # TODO: The Backup Drive Mount Point
 BackupDir='/mnt/Backup'
 
+# TODO: Directory to backup 
+SourceDir='/'
+
 # TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')
 webserverServiceName='$webserverServiceName'
 
@@ -38,13 +41,14 @@ DBUser='nextcloud_db_user'
 # TODO: The password of the Nextcloud database user
 DBPassword='yourpassword'
 
-# TODO: The directory where the Emby or Jellyfin settings are stored (this directory is stored within /var/lib)
-Emby_Conf='/var/lib/emby'
-Jellyfin_Conf='/var/lib/jellyfin'
+# TODO: The service name of the media server. Used to start/stop web server (e.g. 'systemctl start <mediaserverServiceName>')
+MediaserverService='plexmediaserver'
 
-# TODO: The directory where the Plex Media Server settings are stored (this directory is stored within /var/lib)
-Plex_Conf='/var/lib/plexmediaserver'
-# Plex_Conf='/var/lib/plexmediaserver'
+# TODO: The service name of the media server. Used to restore permissions media server settings)
+MediaserverUser='plex'
+
+# TODO: The directory where the Media Server settings are stored (this directory is stored within /var/lib)
+MediaserverConf='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
 
 # Log File
 LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'

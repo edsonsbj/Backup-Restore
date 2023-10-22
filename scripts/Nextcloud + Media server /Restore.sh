@@ -56,7 +56,7 @@ nextcloud_settings() {
 	systemctl stop $webserverServiceName
 
 	# Remove the current Nextcloud folder
-	rm -rf "$NextcloudConfig"
+	mv "$NextcloudConfig" "$NextcloudConfig.bk"
 
     # Restore
 	sudo rsync -avhP "$BackupDir/Nextcloud" "$NextcloudConfig" 1>> $LogFile
@@ -108,7 +108,7 @@ nextcloud_complete() {
 mediaserver_settings() {
     echo "########## Backing up Media Server settings...##########" >> $LogFile
     # Remove the current directory from Media Derver
-    rm -rf "$MediaserverConf"
+    mv "$MediaserverConf" "$MediaserverConf.bk"
 
     # Stop Media Server
     sudo systemctl stop $MediaserverService
