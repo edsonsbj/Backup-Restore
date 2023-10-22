@@ -98,13 +98,13 @@ nextcloud_complete() {
 
 mediaserver_settings() {
     echo "########## Backing up Media Server settings...##########" >> $LogFile
-    # Stop Plex
+    # Stop Media Server
     sudo systemctl stop $MediaserverService
 
     # Backup
     sudo rsync -avhP --delete --exclude={'*/Cache','*/cache','*/Crash Reports','*/Diagnostics','*/Logs','*/logs','*/transcoding-temp'} "$MediaserverConf" "$BackupDir/Mediaserver" 1>> $LogFile
 
-    # Start Plex
+    # Start Media Server
     sudo systemctl start $MediaserverService
 }
 

@@ -325,7 +325,8 @@ EOF
 
   clear
 
-  wget https://raw.githubusercontent.com/edsonsbj/Backup_Restore_Rsync/main/Backup.sh
+  wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Media%20Server/Backup.sh
+  wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/scripts/Media%20Server/Restore.sh
 
   chmod 700 *.sh
 

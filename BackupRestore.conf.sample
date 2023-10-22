@@ -18,7 +18,7 @@ BackupDir='/mnt/Backup'
 SourceDir='/'
 
 # TODO: The service name of the web server. Used to start/stop web server (e.g. 'systemctl start <webserverServiceName>')
-webserverServiceName='$webserverServiceName'
+webserverServiceName='nginx'
 
 # TODO: The directory of your Nextcloud installation (this is a directory under your web root)
 NextcloudConfig='/var/www/nextcloud'
@@ -51,4 +51,4 @@ MediaserverUser='plex'
 MediaserverConf='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server'
 
 # Log File
-LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
+LogFile="/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt"
