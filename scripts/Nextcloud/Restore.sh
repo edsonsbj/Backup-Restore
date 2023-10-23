@@ -3,6 +3,11 @@
 CONFIG="$(dirname "${BASH_SOURCE[0]}")/BackupRestore.conf"
 . $CONFIG
 
+# Create a log file to record command outputs
+touch "$LogFile"
+exec > >(tee -a "$LogFile")
+exec 2>&1
+
 ## ---------------------------------- TESTS ------------------------------ #
 
 # Check if the script is being executed by root or with sudo
@@ -14,42 +19,41 @@ fi
 # Check if the removable drive is connected and mounted correctly
 if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
     echo "########## The drive is connected and mounted. ##########"
-    sudo mount -U $uuid $BackupDir
 else
     echo "########## The drive is not connected or mounted. ##########"
-    exit 1
+
+    # Try to mount the drive
+    sudo mount -U $uuid $BackupDir 2>/dev/null
+
+    # Check if the drive is now mounted
+    if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
+        echo "########## The drive has been successfully mounted. ##########"
+    else
+        echo "########## Failed to mount the drive. Exiting script. ##########"
+        exit 1
+    fi
 fi
 
 # Are there write and read permissions?
-[ ! -w "$BackupDir" ] && {
-  echo "########## No write permissions ##########" >> $LogFile
-  exit 1
-}
-
-echo "Changing to the root directory..."
-cd /
-echo "pwd is $(pwd)"
-echo "restore file location db is " '/'
-
-if [ $? -eq 0 ]; then
-    echo "Done"
-else
-    echo "failed to change to root directory. Restoration failed"
+if [ ! -w "$BackupDir" ]; then
+    echo "########## No write permissions ##########"
     exit 1
 fi
 
+clear 
+
 ## ------------------------------------------------------------------------ #
 
-   echo "########## Restoration Started $( date ). ##########" >> $LogFile
+   echo "########## Restoration Started $( date ). ##########"
 
 # -------------------------------FUNCTIONS----------------------------------------- #
 
 # Function to restore Nextcloud settings
 nextcloud_settings() {
-    echo "############### Restoring Nextcloud settings... ###############" >> $LogFile
+    echo "############### Restoring Nextcloud settings... ###############"
    	# Enabling Maintenance Mode
 	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
 	echo
 
 	# Stop Web Server
@@ -59,34 +63,34 @@ nextcloud_settings() {
 	mv "$NextcloudConfig" "$NextcloudConfig.bk"
 
     # Restore
-	sudo rsync -avhP "$BackupDir/Nextcloud" "$NextcloudConfig" 1>> $LogFile
+	sudo rsync -avhP "$BackupDir/Nextcloud" "$NextcloudConfig" 
 
 	# Restore permissions
 	chmod -R 755 $NextcloudConfig
 	chown -R www-data:www-data $NextcloudConfig
 
 	# Export the database.
-	mysql -u --host=localhost --user=$DBUser --password=$PDBPassword $NextcloudDatabase < "$BackupDir/Nextcloud/nextclouddb.sql" >> $LogFile
+	mysql -u --host=localhost --user=$DBUser --password=$PDBPassword $NextcloudDatabase < "$BackupDir/Nextcloud/nextclouddb.sql"
 
 	# Start Web Server
 	systemctl start $webserverServiceName
 
 	# Disabling Nextcloud Maintenance Mode
 	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off >> $LogFile
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off
 	echo
 }
 
 # Function to restore Nextcloud DATA folder
 nextcloud_data() {
-    echo "############### Restoring Nextcloud DATA folder...###############" >> $LogFile
+    echo "############### Restoring Nextcloud DATA folder...###############"
 	# Enabling Maintenance Mode
 	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on >> $LogFile
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
 	echo
 
     # Restore
-	sudo rsync -avhP "$BackupDir/Nextcloud_datadir" "$NextcloudDataDir" 1>> $LogFile
+	sudo rsync -avhP "$BackupDir/Nextcloud_datadir" "$NextcloudDataDir" 
 
 	# Restore permissions
 	chmod -R 770 $NextcloudDataDir
@@ -94,7 +98,7 @@ nextcloud_data() {
 
 	# Disabling Nextcloud Maintenance Mode
 	echo
-	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off >> $LogFile
+	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --off
 	echo
 }
 
@@ -151,17 +155,17 @@ else
         4)
             echo "Leaving the script."
             exit 0
+            ;;
         *)
             echo "Invalid option!"
             ;;
     esac
 fi
 
-  # Worked well? Unmount.
-  [ "$?" = "0" ] && {
-    echo "############## Restore completed. The removable drive has been unmounted and powered off. ###########" >> $LogFile
- 	eval umount /dev/disk/by-uuid/$uuid
-	eval sudo udisksctl power-off -b /dev/disk/by-uuid/$uuid >>$LogFile
+# Worked well? Unmount.
+if [ "$?" = "0" ]; then
+    echo "############## Restore completed. The removable drive has been unmounted and powered off. ###########" >> "$LogFile"
+    umount "/dev/disk/by-uuid/$uuid"
+    sudo udisksctl power-off -b "/dev/disk/by-uuid/$uuid" >> "$LogFile"
     exit 0
-  }
-}
+fi

@@ -1,11 +1,6 @@
-[![release](https://img.shields.io/badge/dynamic/json.svg?label=release&url=https://codeberg.org/api/v1/repos/DecaTec/Nextcloud-Backup-Restore/releases&query=$[0].tag_name)](https://codeberg.org/DecaTec/Nextcloud-Backup-Restore/releases)
+# Backup-Restore
 
-# Nextcloud-Backup-Restore
-
-Bash scripts for backup/restore of [Nextcloud](https://nextcloud.com/).
-
-It is based on a Nextcloud installation using nginx and PostgreSQL/MariaDB (see the (German) tutorial [Nextcloud auf Ubuntu Server 22.04 LTS mit nginx, PostgreSQL/MariaDB, PHP, Let’s Encrypt, Redis und Fail2ban](https://decatec.de/home-server/nextcloud-auf-ubuntu-server-22-04-lts-mit-nginx-postgresql-mariadb-php-lets-encrypt-redis-und-fail2ban/)).\
-The scripts can also be used when Apache is used as webserver.
+Bash scripts for backup/restore of [Nextcloud](https://nextcloud.com/) and media servers as [Emby](https://emby.media/) [Jellyfin](https://jellyfin.org/) and [Plex](https://www.plex.tv/) that are installed in the same location.
 
 ## General information
 
