@@ -36,11 +36,15 @@ Keep in mind that the configuration file `BackupRestore.conf` hast to be located
 
 1. install Git if it is not installed.
 2. Clone this Repository or download and unzip the zip file. git clone.
-```git clone https://github.com/edsonsbj/Backup-Restore.git```
+```
+git clone https://github.com/edsonsbj/Backup-Restore.git
+```
 3. Choose the script you want to use for backup and restore and delete the others. Remember that the scripts in the root folder are intended to backup all the files on your system, useful if you are not interested in backing up and restoring Nextcloud, Emby, Jellyfin and Plex servers.
 4. Copy the file BackupRestore.conf.sample to BackupRestore.conf, which must be in the same folder as the scripts
 5. Make Scripts Executable.
-```chmod 700 *.sh``` 
+```
+chmod 700 *.sh
+``` 
 
 ## Performing Backup or Restoration
 
