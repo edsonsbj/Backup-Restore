@@ -17,6 +17,7 @@ With these scripts, all these elements can be included in a backup.
 - After cloning or downloading the scripts, these need to be set up by running the script `setup.sh` (see below).
 - If you do not want to use the automated setup, you can also use the file `BackupRestore.conf.sample` as a starting point. Just make sure to rename the file when you are done (`cp BackupRestore.conf.sample BackupRestore.conf`)
 - The configuration file `BackupRestore.conf` has to be located in the same directory as the scripts for backup/restore.
+- If using for Backup or Restoration of `Nextcloud`, `Plex` or `Emby` servers, the scripts in this repository assume that the programs were installed via `apt-get` or `dpkg` (Media Server) and full installation (`Nextcloud`) with `nginx`, `php` and `redis`.
 
 ## Setup Automated
 
