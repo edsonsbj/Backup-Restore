@@ -24,12 +24,8 @@ With these scripts, all these elements can be included in a backup.
 ```
 wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/setup.sh && sudo chmod 700 *.sh && ./sudo setup.sh
 ```
-1. Clone the repository: `git clone https://github.com/edsonsbj/Backup-Restore.git`
-2. Set permissions:
-    - `chown -R root Backup-Restore`
-    - `cd Backup-Restore`
-    - `chmod 700 *.sh`
-3. Call the (interactive) script for automated setup (this will create a file `BackupRestore.conf` containing the desired configuration): `./setup.sh`
+2. After running the `setup.sh` interactive script, the `Backup.sh` and `Restore.sh` scripts will be generated based on your selection, along with the `BackupRestore.conf` for using the script, in addition to configuring cron.
+3. **Important**: check that all files were created and must be in /root/Scripts. 
 4. **Important**: Check this configuration file if everything was set up correctly (see *TODO* in the configuration file comments)
 5. Start using the scripts: See sections *Backup* and *Restore* below
 
