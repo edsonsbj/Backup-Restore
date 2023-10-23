@@ -18,7 +18,7 @@ With these scripts, all these elements can be included in a backup.
 - If you do not want to use the automated setup, you can also use the file `BackupRestore.conf.sample` as a starting point. Just make sure to rename the file when you are done (`cp BackupRestore.conf.sample BackupRestore.conf`)
 - The configuration file `BackupRestore.conf` has to be located in the same directory as the scripts for backup/restore.
 
-## Setup
+## Setup Automated
 
 1. Run the following command at a terminal with administrator privileges 
 ```
@@ -31,16 +31,62 @@ wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/setup.sh && 
 
 Keep in mind that the configuration file `BackupRestore.conf` hast to be located in the same directory as the scripts for backup/restore, otherwise the configuration will not be found.
 
+## Setup Manual 
+
+1. install Git if it is not installed.
+2. Clone this Repository or download and unzip the zip file. git clone,
+3. Choose the script you want to use for backup and restore and delete the others. Remember that the scripts in the root folder are intended to backup all the files on your system, useful if you are not interested in backing up and restoring Nextcloud, Emby, Jellyfin and Plex servers.
+4. Copy the file BackupRestore.conf.sample to BackupRestore.conf, which must be in the same folder as the scripts
+
 ## Performing Backup or Restoration
 
-Call the script
+### Backup ### 
+
+If you choose option 1 >> Backup in the setup.sh automated script, or you have cloned the entire repository to use and want to use the scripts contained in the repository root, run the script like this:
 
 ```
 sudo ./Backup.sh
-```  
+```
 
-You can also call this script by cron. Example (at 2am every night.
+### Media server ###
+
+If you selected option 3 >> Backup in the automated setup.sh script, or downloaded the Media Server folder, run the script as follows:
 
 ```
-0 2 * * * sudo /path/to/scripts/Backup-Restore/Backup.sh
+sudo ./Backup.sh
 ```
+
+Nextcloud & Nextcloud + Media Server
+
+If you chose between options 2 or 4 >> Nextcloud and Nextcloud + Media Server in the automated setup.sh script, or downloaded one of the Nextcloud or Nextcloud + Media Server folders, invoke the script like this: 
+
+### Nextcloud ###
+
+```
+sudo ./Backup.sh 1
+```
+Backup Nextcloud configurations, database, and data folder.
+
+```
+sudo ./Backup.sh 2
+```
+Backup Nextcloud configurations and database.
+
+```
+sudo ./Backup.sh 3
+```
+Backup Nextcloud configurations and database.
+
+### Nextcloud + Media Server ###
+
+Here the commands described above remain the same 
+
+```
+sudo ./Backup.sh 4
+```
+Backup Nextcloud and Media Server Settings
+
+```
+sudo ./Backup.sh 5
+```
+Backup Nextcloud settings, database and data folder, as well as Media Server settings.
