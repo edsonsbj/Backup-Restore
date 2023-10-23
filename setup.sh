@@ -10,7 +10,7 @@ LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
 SourceDir='/'
 webserverServiceName='nginx'
 NextcloudConfig='/var/www/nextcloud'
-script_backup=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)/Backup.sh
+script_backup=$(cd $(dirname "${BASH_SOURCE[0]}") && pwd)/Scripts/Backup.sh
 Plex_Conf='/var/lib/plexmediaserver/Library/Application Support/Plex Media Server' # Diretório de configuração do Plex
 Emby_Conf='/var/lib/emby' # Diretório de configuração do Emby
 Jellyfin_Conf='/var/lib/jellyfin' # Diretório de configuração do Jellyfin
@@ -25,8 +25,12 @@ MediaserverUser=''
 # Function for error messages
 errorecho() { cat <<< "$@" 1>&2; }
 
-# Gather information
-#
+# Check if the script is being executed by root or with sudo
+if [[ $EUID -ne 0 ]]; then
+   echo "========== This script needs to be executed as root or with sudo. ==========" 
+   exit 1
+fi
+
 clear
 
 #############################################################################################

@@ -12,45 +12,43 @@ exec 2>&1
 
 # Check if the script is being executed by root or with sudo
 if [[ $EUID -ne 0 ]]; then
-   echo "########## This script needs to be executed as root or with sudo. ##########" 
+   echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
 
 # Check if the removable drive is connected and mounted correctly
 if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
-    echo "########## The drive is connected and mounted. ##########"
+    echo "========== The drive is connected and mounted. =========="
+    echo ""
 else
-    echo "########## The drive is not connected or mounted. ##########"
+    echo "========== The drive is not connected or mounted. =========="
 
     # Try to mount the drive
     sudo mount -U $uuid $BackupDir 2>/dev/null
 
     # Check if the drive is now mounted
     if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
-        echo "########## The drive has been successfully mounted. ##########"
+        echo "========== The drive has been successfully mounted. =========="
+        echo ""
     else
-        echo "########## Failed to mount the drive. Exiting script. ##########"
+        echo "========== Failed to mount the drive. Exiting script. =========="
         exit 1
     fi
 fi
 
 # Are there write and read permissions?
 if [ ! -w "$BackupDir" ]; then
-    echo "########## No write permissions ##########"
+    echo "========== No write permissions =========="
     exit 1
 fi
-
-clear 
-
-## ------------------------------------------------------------------------ #
-
-   echo "########## Starting Backup $( date ). ##########"
 
 # -------------------------------FUNCTIONS----------------------------------------- #
 
 # Function to backup Nextcloud settings
 nextcloud_settings() {
-    echo "############### Backing up Nextcloud settings... ###############"
+    echo "========== Backing up Nextcloud settings... $( date ) =========="
+    echo ""
+
    	# Enabling Maintenance Mode
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
 
@@ -72,7 +70,9 @@ nextcloud_settings() {
 
 # Function to backup Nextcloud DATA folder
 nextcloud_data() {
-    echo "############### Backing up Nextcloud DATA folder...###############"
+    echo "========== Backing up Nextcloud DATA folder... $( date )=========="
+    echo ""
+
 	# Enabling Maintenance Mode
 	sudo -u www-data php $NextcloudConfig/occ maintenance:mode --on
 
@@ -85,13 +85,12 @@ nextcloud_data() {
 
 # Function to perform a complete Nextcloud backup
 nextcloud_complete() {
-    echo "########## Performing complete Nextcloud backup...##########"
     nextcloud_settings
     nextcloud_data
 }
 
 mediaserver_settings() {
-    echo "########## Backing up Media Server settings...##########"
+    echo "=============== Backing up Media Server settings... $( date)==============="
     # Stop Media Server
     sudo systemctl stop $MediaserverService
 
@@ -172,7 +171,7 @@ fi
 
 # Worked well? Unmount.
 if [ "$?" = "0" ]; then
-    echo "############## Restore completed. The removable drive has been unmounted and powered off. ###########" >> "$LogFile"
+    echo "===============#### Backup completed. The removable drive has been unmounted and powered off. ===============#" >> "$LogFile"
     umount "/dev/disk/by-uuid/$uuid"
     sudo udisksctl power-off -b "/dev/disk/by-uuid/$uuid" >> "$LogFile"
     exit 0
