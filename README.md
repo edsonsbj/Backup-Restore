@@ -17,11 +17,13 @@ With these scripts, all these elements can be included in a backup.
 - After cloning or downloading the scripts, these need to be set up by running the script `setup.sh` (see below).
 - If you do not want to use the automated setup, you can also use the file `BackupRestore.conf.sample` as a starting point. Just make sure to rename the file when you are done (`cp BackupRestore.conf.sample BackupRestore.conf`)
 - The configuration file `BackupRestore.conf` has to be located in the same directory as the scripts for backup/restore.
-- The scripts assume that Nextcloud's data directory is *not* a subdirectory of the Nextcloud installation (file directory). The general recommendation is that the data directory should not be located somewhere in the web folder of your webserver (usually */var/www/*), but in a different folder (e.g. */var/nextcloud_data*). For more information, see [here](https://docs.nextcloud.com/server/latest/admin_manual/installation/installation_wizard.html#data-directory-location-label).
-- The scripts support nginx and Apache as webserver.
 
 ## Setup
 
+1. Run the following command at a terminal with administrator privileges 
+```
+wget https://raw.githubusercontent.com/edsonsbj/Backup-Restore/main/setup.sh && sudo chmod 700 *.sh && ./sudo setup.sh
+```
 1. Clone the repository: `git clone https://github.com/edsonsbj/Backup-Restore.git`
 2. Set permissions:
     - `chown -R root Backup-Restore`
