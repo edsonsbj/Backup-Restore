@@ -12,36 +12,37 @@ exec 2>&1
 
 # Check if the script is being executed by root or with sudo
 if [[ $EUID -ne 0 ]]; then
-   echo "=============== This script needs to be executed as root or with sudo. ==============="
-   echo "" 
+   echo "========== This script needs to be executed as root or with sudo. ==========" 
    exit 1
 fi
 
-# Check if the removable drive is connected and mounted correctly
-if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
-    echo "=============== The drive is connected and mounted. ==============="
-    echo ""
+device=$(blkid -U "$uuid")
+
+if [ -z "$device" ]; then
+  echo "========== The unit with UUID $uuid Is not connected. Leaving the script.=========="
+  exit 1
+fi
+
+echo "========== The unit with UUID $uuid is connected and corresponds to the device $device. =========="
+
+# Check that the unit is assembled
+if grep -qs "$BackupDisk" /proc/mounts; then
+  echo "========== The unit is assembled ==========."
 else
-    echo "=============== The drive is not connected or mounted. ==============="
-    echo ""
+  echo "========== The unit is not assembled. Trying to assemble...=========="
 
-    # Try to mount the drive
-    sudo mount -U $uuid $BackupDir 2>/dev/null
-
-    # Check if the drive is now mounted
-    if [[ $(lsblk -no uuid /dev/sd*) == *"$uuid"* ]]; then
-        echo "=============== The drive has been successfully mounted. ==============="
-        echo ""
-    else
-        echo "=============== Failed to mount the drive. Exiting script. ==============="
-        echo ""
-        exit 1
-    fi
+  # Try to assemble the unit
+  if mount "$device" "$BackupDisk"; then
+    echo "========== The unit was successfully assembled.=========="
+  else
+    echo "========== Failure when setting up the unit. Leaving the script.=========="
+    exit 1
+  fi
 fi
 
 # Are there write and read permissions?
-if [ ! -w "$BackupDir" ]; then
-    echo "=============== No write permissions ==============="
+if [ ! -w "$BackupDisk" ]; then
+    echo "========== No write permissions =========="
     exit 1
 fi
 

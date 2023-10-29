@@ -12,7 +12,7 @@
 uuid='123456789ABCDEFGH'
 
 # TODO: The Backup Drive Mount Point
-BackupDir='/mnt/Backup'
+BackupDisk='/mnt/Backup'
 
 # TODO: Directory to backup 
 SourceDir='/'

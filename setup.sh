@@ -4,7 +4,7 @@
 #################################### Pre defined variables ##################################
 #############################################################################################
 
-BackupDir='/mnt/nextcloud_backup'
+BackupDisk='/mnt/nextcloud_backup'
 BackupRestoreConf='BackupRestore.conf'
 LogFile='/var/log/Rsync-$(date +%Y-%m-%d_%H-%M).txt'
 SourceDir='/'
@@ -90,11 +90,11 @@ disk_backup() {
   clear
 
   echo "Enter the backup drive mount point here."
-  echo "Default: ${BackupDir}"
+  echo "Default: ${BackupDisk}"
   echo ""
-  read -p "Enter a directory or press ENTER if the backup directory is ${BackupDir}: " BACKUPDIR
+  read -p "Enter a directory or press ENTER if the backup directory is ${BackupDisk}: " BACKUPDISK
 
-  [ -z "$BACKUPDIR" ] ||  BackupDir=$BACKUPDIR
+  [ -z "$BACKUPDISK" ] ||  BackupDisk=$BACKUPDISK
 
   clear
 
@@ -108,7 +108,7 @@ disk_backup() {
 uuid='$uuid'
 
 # TODO: The Backup Drive Mount Point
-BackupDir='$BackupDir'
+BackupDisk='$BackupDisk'
 
 # Log File
 LogFile="$LogFile"
